@@ -1,0 +1,158 @@
+// Default Paramaters
+def default_git_repository_credentials = "git_repository_credentials"
+
+def default_docker_registry = "registry.hub.docker.com"
+def default_docker_registry_credentials = "docker_registry_credentials"
+
+def default_not_jenkins_url = "https://not-jenkins2.thehempathy.com"
+def default_not_jenkins_secret = "not_jenkins_token"
+
+
+// 
+
+def namespace = "thehempathy"
+def image_name = "backend-express"
+
+def not_jenkins_addr = "https://not-jenkins2.thehempathy.com"
+def not_jenkins_secret = "not_jenkins_backend_express_token"
+
+def registry = "registry.philippeduval.ca"
+def registry_credentials = "registry"
+
+
+def git_credentials = "github"
+def git_server = "github.com"
+def git_repo = "thehempathy/backend-express.git"
+def git_url_ssh = "${git_server}:${git_repo}"
+def git_url_http = "${git_server}/${git_repo}"
+
+def build = false
+def promote = false
+
+pipeline {
+    agent any
+
+    parameters {
+        string(name: 'gitRepository', description: 'Git Repository')
+        string(name: 'gitRepositoryCredentials', defaultValue: "${default_git_repository_credentials}", description: 'Git Repository Credentials')
+
+        string(name: 'dockerRegistry', defaultValue: "${default_docker_registry}", description: 'Docker Registry')
+        string(name: 'dockerRegsitryCredentials', defaultValue: "${default_docker_registry_credentials}", description: 'Docker Registry Credentials')
+        string(name: 'dockerNamespace', description: 'Docker Name Space')
+        string(name: 'dockerImageName', description: 'The last extension of a docker image name')
+
+        string(name: 'dockerStackName', description: 'Docker Stack Name to deploy to')
+        string(name: 'dockerServiceName', description: 'Docker Service Name to deploy to')
+
+        string(name: 'notJenkinsUrl', defaultValue: "${default_not_jenkins_url}", description: 'Not Jenkins Url')
+        string(name: 'notJenkinsSecret', defaultValue: "${default_not_jenkins_secret}", description: 'Not Jenkins secret')
+
+    }
+
+
+    environment {
+        DOCKER_REGISTRY = "${registry}"
+        DOCKER_NAMESPACE = "${namespace}"
+        DOCKER_IMAGE_NAME = "${image_name}"
+        DOCKER_CREDENTIALS = credentials("${registry_credentials}")
+        GITHUB_CREDENTIALS = credentials("${git_credentials}")
+        GITHUB_URL = "${git_url_http}"
+        SECRET = credentials("${not_jenkins_secret}")
+        DOCKER_SERVICE = ""
+    }
+
+    stages {
+        stage ('Validate Parameters') {
+
+            steps {
+                script {
+                    if ( params.gitRepository == null ) {
+                        sh 'exit 1'
+                    }
+                }
+            }
+
+        }
+
+        stage ('Prepare build') {
+            steps {
+                script {
+                    def releasePattern = /release\/(.*)/
+
+                     switch(BRANCH_NAME) {
+                        case "develop":
+                            build = true
+                            env.VERSION = "latest"
+                            env.DEPLOY_ENV = "dev"
+                            break
+                        case ~releasePattern:
+                            def matcher = BRANCH_NAME =~ releasePattern
+                            def version = matcher[0][1]
+                            env.VERSION = version
+                            env.DEPLOY_ENV = "stage"
+                            build = true
+                            break
+                        case "master":
+                            promote = true
+                            sh "git remote set-url origin https://${GITHUB_CREDENTIALS_USR}:${GITHUB_CREDENTIALS_PSW}@${GITHUB_URL}"
+                            sh "git fetch --tags > /dev/null"
+                            env.VERSION = sh (returnStdout: true, script: '''
+                                echo $(git tag --points-at HEAD)
+                                ''').trim()
+                            env.DEPLOY_ENV = "prod"
+                    }
+
+                    if ( build ) {
+                        echo "Building version ${env.VERSION} in ${env.DEPLOY_ENV}"
+                    }
+                    
+                    if ( promote ) {
+                        echo "Promoting version ${env.VERSION} in ${env.DEPLOY_ENV}"
+                    }
+
+                    env.FULL_NAME = "${DOCKER_REGISTRY}/${DOCKER_NAMESPACE}/${DOCKER_IMAGE_NAME}:${VERSION}"
+                }
+            }
+        }
+        stage('Build') {
+            when {
+                expression {
+                    return build
+                }
+            }
+            environment {
+                BUILD_VERSION = "${VERSION}"
+                FULL_NAME = "${DOCKER_REGISTRY}/${DOCKER_NAMESPACE}/${DOCKER_IMAGE_NAME}:${VERSION}"
+            }
+            steps {
+                echo 'Building..'
+
+                script {
+                    env.imageName = "${FULL_NAME}"
+                    sh 'chmod +x ./jenkins/scripts/build.sh'
+                    sh 'sudo -E ./jenkins/scripts/build.sh'
+                }
+            }
+        }
+        stage('Test API') {
+            environment {
+                FULL_NAME = "${env.imageName}"
+                DB_NAME = "registry.philippeduval.ca/thehempathy/database"
+            }
+            steps {
+                echo 'Not testing..'
+                //sh 'sudo -E ./jenkins/scripts/test.sh'
+            }
+        }
+
+        stage('Deploy') {
+            environment {
+                NOT_JENKINS_URL = "${not_jenkins_addr}/${namespace}-${env.DEPLOY_ENV}/${image_name}"
+            }
+            steps {
+                echo 'Deploying....'
+                sh 'sudo -E ./jenkins/scripts/deploy.sh'
+            }
+        }
+    }
+}
