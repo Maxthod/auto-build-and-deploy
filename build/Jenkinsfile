@@ -66,8 +66,13 @@ pipeline {
 
             steps {
                 script {
+                    echo 
                     if ( params.gitRepository == null ) {
+                        echo "Is was null"
                         sh 'exit 1'
+                    } else {
+                        echo "it wasnt"
+                        echo "${params.gitRepository}"
                     }
                 }
             }
