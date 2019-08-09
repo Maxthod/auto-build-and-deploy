@@ -69,9 +69,14 @@ pipeline {
                     if ( params.gitRepository == null ) {
                         echo "Is was null"
                         sh 'exit 1'
-                    } else {
+                    } else if( !params.gitRepository ) {
+                        echo "it as not oijerg"
+                        sh 'exit 1'
+                    }
+                    else {
                         echo "it wasnt"
                         echo "${params.gitRepository}"
+                        sh 'exit 1'
                     }
                 }
             }
