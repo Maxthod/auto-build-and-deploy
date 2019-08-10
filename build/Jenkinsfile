@@ -135,14 +135,16 @@ pipeline {
                     }
 
                     if ( build ) {
-                        echo "Building version ${env.VERSION} in ${env.DEPLOY_ENV}"
+                        echo "Building version ${env.DOCKER_VERSION} in ${env.DEPLOY_ENV}"
                     }
                     
                     if ( promote ) {
-                        echo "Promoting version ${env.VERSION} in ${env.DEPLOY_ENV}"
+                        echo "Promoting version ${env.DOCKER_VERSION} in ${env.DEPLOY_ENV}"
                     }
 
                     env.DOCKER_FULL_IMAGE_NAME = "${env.DOCKER_REGISTRY}/${env.DOCKER_NAMESPACE}/${env.DOCKER_IMAGE_NAME}:${env.DOCKER_VERSION}"
+
+                    echo "Docker image name : [${env.DOCKER_FULL_IMAGE_NAME}]"
                 }
             }
         }
