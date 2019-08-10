@@ -66,6 +66,12 @@ pipeline {
 
             steps {
                 script {
+
+                    params.each { key, value ->
+                        if ( !value ) {
+                            echo "${key} was not set"
+                        }
+                    }
                   
                     if ( !params.gitBranch ) {
                         echo "Fucking hell"
