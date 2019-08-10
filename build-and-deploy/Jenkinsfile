@@ -148,7 +148,7 @@ pipeline {
             steps {
                 script {
                     build job: 'auto-build/master', parameters: [
-                        string(name: 'gitBranch', value: "${params.gitBranch}")
+                        string(name: 'gitBranch', value: "${params.gitBranch}"),
                         string(name: 'gitRepository', value: "${params.gitRepository}"),
                         string(name: 'gitRepositoryCredentials', value: "${params.gitRepositoryCredentials}"),
                         string(name: 'dockerRegistry', value: "${params.dockerRegistry}"),
