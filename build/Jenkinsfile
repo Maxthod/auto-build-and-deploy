@@ -35,14 +35,6 @@ pipeline {
         //string(name: 'dockerImageName', description: 'The last extension of a docker image name')
         string(name: 'dockerImageName', defaultValue: 'backend-express', description: 'The last extension of a docker image name')
 
-        //string(name: 'dockerStackName', description: 'Docker Stack Name to deploy to')
-        string(name: 'dockerStackName', defaultValue: 'thehempathy', description: 'Docker Stack Name to deploy to')
-        //string(name: 'dockerServiceName', description: 'Docker Service Name to deploy to')
-        string(name: 'dockerServiceName', defaultValue: 'backend_express', description: 'Docker Service Name to deploy to')
-
-        string(name: 'notJenkinsUrl', defaultValue: "${default_not_jenkins_url}", description: 'Not Jenkins Url')
-        string(name: 'notJenkinsSecret', defaultValue: "${default_not_jenkins_secret}", description: 'Not Jenkins secret')
-
     }
 
 
@@ -58,12 +50,6 @@ pipeline {
 
         DOCKER_NAMESPACE = "${params.dockerNamespace}"
         DOCKER_IMAGE_NAME = "${params.dockerImageName}"
-
-        DOCKER_STACK_NAME = "${params.dockerStackName}"
-        DOCKER_SERVICE_NAME = "${params.dockerServiceName}"
-
-        NOT_JENKINS_URL = "${params.notJenkinsUrl}"
-        NOT_JENKINS_SECRET = "${params.notJenkinsSecret}"
 
     }
 
