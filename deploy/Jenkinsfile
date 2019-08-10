@@ -1,0 +1,88 @@
+// Default Paramaters
+def default_not_jenkins_url = "https://not-jenkins2.thehempathy.com"
+def default_not_jenkins_secret = "not_jenkins_token"
+
+
+// Internal variable for pipeline
+def invalidParam = false
+def autoCancelled = false
+
+pipeline {
+    agent any
+
+    parameters {
+        //string(name: 'dockerImageName', description: 'The last extension of a docker image name')
+        string(name: 'dockerImageName', defaultValue: 'backend-express', description: 'The last extension of a docker image name')
+
+        //string(name: 'dockerTag', description: 'The Docker Tag to be deploy')
+        string(name: 'dockerTag', defaultValue: 'latest', description: 'The last extension of a docker image name')
+
+        string(name: 'notJenkinsUrl', defaultValue: "${default_not_jenkins_url}", description: 'Not Jenkins Url')
+        string(name: 'notJenkinsSecret', defaultValue: "${default_not_jenkins_secret}", description: 'Not Jenkins secret')
+
+    }
+
+
+    environment {
+
+        DOCKER_IMAGE_NAME = "${params.dockerImageName}"
+
+        DOCKER_VERSION = "${params.dockerTag}"
+
+        NOT_JENKINS_URL = "${params.notJenkinsUrl}"
+        NOT_JENKINS_SECRET = "${params.notJenkinsSecret}"
+
+    }
+
+    stages {
+        stage ('Validate Parameters') {
+
+            steps {
+                script {
+                    params.each { key, value ->
+                        if ( !value || value == "" ) {
+                            echo "Param ${key} was not set"
+                            invalidParam = true
+                        }
+                    }
+             
+                    if ( invalidParam ) {
+                        echo "Invalid parameters detected. Aborting pipeline..."
+                        autoCancelled = true
+                        currentBuild.result = 'FAILURE'
+
+                    }
+                }
+            }
+
+        }
+
+        stage('Deploy') {
+            when {
+                expression {
+                    return !autoCancelled
+                }
+            }
+            steps {
+                echo 'Deploying ...'
+
+                script {
+                    sh 'chmod +x ./deploy/scripts/deploy.sh'
+                    sh 'sudo -E ./deploy/scripts/deploy.sh'
+                }
+            }
+        }
+        stage('Test') {
+            when {
+                expression {
+                    return !autoCancelled
+                }
+            }
+            steps {
+                echo 'Testing ...'
+                echo 'Actually doing nothing.'
+                //sh 'sudo -E ./jenkins/scripts/test.sh'
+            }
+        }
+    }
+}
