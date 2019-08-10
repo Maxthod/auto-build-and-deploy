@@ -69,7 +69,7 @@ pipeline {
                   
                     if ( params.gitBranch == "" ) {
                         echo "Fucking hell"
-                        //invalidParam("gitBranch")
+                        invalidParam("totoAfrica")
                     } else {
                         echo "jcomprends rien"
                     }
@@ -218,7 +218,8 @@ pipeline {
     }
 }
 
-def paramInvalid ( param ) {
+def paramInvalid ( avalue ) {
+    echo "wtf"
     invalidParam = true
-    echo "Param ${param} was not set"
+    echo "Param ${avalue} was not set"
 }
