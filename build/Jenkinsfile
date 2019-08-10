@@ -34,6 +34,9 @@ pipeline {
         string(name: 'dockerNamespace', defaultValue: 'thehempathy', description: 'Docker Name Space')
         //string(name: 'dockerImageName', description: 'The last extension of a docker image name')
         string(name: 'dockerImageName', defaultValue: 'backend-express', description: 'The last extension of a docker image name')
+        
+        //string(name: 'dockerTag', description: 'The Docker Tag to be build')
+        string(name: 'dockerTag', defaultValue: 'latest', description: 'The last extension of a docker image name')
 
     }
 
@@ -50,6 +53,7 @@ pipeline {
 
         DOCKER_NAMESPACE = "${params.dockerNamespace}"
         DOCKER_IMAGE_NAME = "${params.dockerImageName}"
+        DOCKER_VERSION = "${params.dockerTag}"
 
     }
 
@@ -75,7 +79,6 @@ pipeline {
             }
 
         }
-
         stage ('Git Clone') {
             when {
                 expression {
@@ -87,54 +90,6 @@ pipeline {
                     def workdir = "${cloneDirectory}"
                     sh "rm -rf ${workdir}"
                     sh "git clone https://${env.GIT_REPOSITORY_CREDENTIALS_USR}:${env.GIT_REPOSITORY_CREDENTIALS_PSW}@${env.GIT_REPOSITORY} -b ${env.GIT_BRANCH} ${workdir}"
-                }
-            }
-        }
-        stage ('Prepare build') {
-            when {
-                expression {
-                    return !autoCancelled
-                }
-            }
-            steps {
-                script {
-                    def releasePattern = /release\/(.*)/
-                    def gitBranchName = "${env.GIT_BRANCH}"
-
-                     switch(gitBranchName) {
-                        case "develop":
-                            build = true
-                            env.DOCKER_VERSION = "latest"
-                            env.DEPLOY_ENV = "dev"
-                            break
-                        case ~releasePattern:
-                            def matcher = gitBranchName =~ releasePattern
-                            def version = matcher[0][1]
-                            env.DOCKER_VERSION = version
-                            env.DEPLOY_ENV = "stage"
-                            build = true
-                            break
-                        case "master":
-                            promote = true
-                            sh "git remote set-url origin https://${GIT_REPOSITORY_CREDENTIALS_USR}:${GIT_REPOSITORY_CREDENTIALS_PSW}@${GIT_REPOSITORY}"
-                            sh "git fetch --tags > /dev/null"
-                            env.DOCKER_VERSION = sh (returnStdout: true, script: '''
-                                echo $(git tag --points-at HEAD)
-                                ''').trim()
-                            env.DEPLOY_ENV = "prod"
-                    }
-
-                    if ( build ) {
-                        echo "Building version ${env.DOCKER_VERSION} in ${env.DEPLOY_ENV}"
-                    }
-                    
-                    if ( promote ) {
-                        echo "Promoting version ${env.DOCKER_VERSION} in ${env.DEPLOY_ENV}"
-                    }
-
-                    env.DOCKER_FULL_IMAGE_NAME = "${env.DOCKER_REGISTRY}/${env.DOCKER_NAMESPACE}/${env.DOCKER_IMAGE_NAME}:${env.DOCKER_VERSION}"
-
-                    echo "Docker image name : [${env.DOCKER_FULL_IMAGE_NAME}]"
                 }
             }
         }

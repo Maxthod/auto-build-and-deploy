@@ -1,0 +1,164 @@
+// Default Paramaters
+def default_git_repository_credentials = "git_repository_credentials"
+
+def default_docker_registry = "registry.hub.docker.com"
+def default_docker_registry_credentials = "docker_registry_credentials"
+
+def default_not_jenkins_url = "https://not-jenkins2.thehempathy.com"
+def default_not_jenkins_secret = "not_jenkins_token"
+
+
+// Internal variable for pipeline
+def cloneDirectory = "workdir"
+def invalidParam = false
+def autoCancelled = false
+def build = false
+def promote = false
+
+pipeline {
+    agent any
+
+    parameters {
+        //string(name: 'gitBranch', description: 'Git Branch to clone')
+        string(name: 'gitBranch', defaultValue: 'develop', description: 'Git Branch to clone')
+        //string(name: 'gitRepository', description: 'Git Repository')
+        string(name: 'gitRepository', defaultValue:'github.com/thehempathy/backend-express.git', description: 'Git Repository')
+        
+        string(name: 'gitRepositoryCredentials', defaultValue: "${default_git_repository_credentials}", description: 'Git Repository Credentials')
+
+        //string(name: 'dockerRegistry', defaultValue: "${default_docker_registry}", description: 'Docker Registry')
+        string(name: 'dockerRegistry', defaultValue: "registry.philippeduval.ca", description: 'Docker Registry')
+        //string(name: 'dockerRegistryCredentials', defaultValue: "${default_docker_registry_credentials}", description: 'Docker Registry Credentials')
+        string(name: 'dockerRegistryCredentials', defaultValue: "docker_registry_philippeduval_ca_credentials", description: 'Docker Registry Credentials')
+        //string(name: 'dockerNamespace', description: 'Docker Name Space')
+        string(name: 'dockerNamespace', defaultValue: 'thehempathy', description: 'Docker Name Space')
+        //string(name: 'dockerImageName', description: 'The last extension of a docker image name')
+        string(name: 'dockerImageName', defaultValue: 'backend-express', description: 'The last extension of a docker image name')
+
+        //string(name: 'dockerStackName', description: 'Docker Stack Name to deploy to')
+        string(name: 'dockerStackName', defaultValue: 'thehempathy', description: 'Docker Stack Name to deploy to')
+        //string(name: 'dockerServiceName', description: 'Docker Service Name to deploy to')
+        string(name: 'dockerServiceName', defaultValue: 'backend_express', description: 'Docker Service Name to deploy to')
+
+        string(name: 'notJenkinsUrl', defaultValue: "${default_not_jenkins_url}", description: 'Not Jenkins Url')
+        string(name: 'notJenkinsSecret', defaultValue: "${default_not_jenkins_secret}", description: 'Not Jenkins secret')
+
+    }
+
+/*
+    environment {
+        GIT_CLONE_DIRECTORY = "${cloneDirectory}"
+
+        GIT_BRANCH = "${params.gitBranch}"
+        GIT_REPOSITORY = "${params.gitRepository}"
+        GIT_REPOSITORY_CREDENTIALS = credentials("${params.gitRepositoryCredentials}")
+
+        DOCKER_REGISTRY = "${params.dockerRegistry}"
+        DOCKER_REGISTRY_CREDENTIALS = credentials("${params.dockerRegistryCredentials}")
+
+        DOCKER_NAMESPACE = "${params.dockerNamespace}"
+        DOCKER_IMAGE_NAME = "${params.dockerImageName}"
+
+        DOCKER_STACK_NAME = "${params.dockerStackName}"
+        DOCKER_SERVICE_NAME = "${params.dockerServiceName}"
+
+        NOT_JENKINS_URL = "${params.notJenkinsUrl}"
+        NOT_JENKINS_SECRET = "${params.notJenkinsSecret}"
+
+    }
+    */
+
+    stages {
+        stage ('Validate Parameters') {
+
+            steps {
+                script {
+                    params.each { key, value ->
+                        if ( !value || value == "" ) {
+                            echo "Param ${key} was not set"
+                            invalidParam = true
+                        }
+                    }
+             
+                    if ( invalidParam ) {
+                        echo "Invalid parameters detected. Aborting pipeline..."
+                        autoCancelled = true
+                        currentBuild.result = 'FAILURE'
+
+                    }
+                }
+            }
+
+        }
+
+        stage ('Prepare pipeline') {
+            when {
+                expression {
+                    return !autoCancelled
+                }
+            }
+            steps {
+                script {
+                    def releasePattern = /release\/(.*)/
+                    def gitBranchName = "${env.GIT_BRANCH}"
+
+                     switch(gitBranchName) {
+                        case "develop":
+                            build = true
+                            env.DOCKER_VERSION = "latest"
+                            env.DEPLOY_ENV = "dev"
+                            break
+                        case ~releasePattern:
+                            def matcher = gitBranchName =~ releasePattern
+                            def version = matcher[0][1]
+                            env.DOCKER_VERSION = version
+                            env.DEPLOY_ENV = "stage"
+                            build = true
+                            break
+                        case "master":
+                            promote = true
+                            sh "git remote set-url origin https://${GIT_REPOSITORY_CREDENTIALS_USR}:${GIT_REPOSITORY_CREDENTIALS_PSW}@${GIT_REPOSITORY}"
+                            sh "git fetch --tags > /dev/null"
+                            env.DOCKER_VERSION = sh (returnStdout: true, script: '''
+                                echo $(git tag --points-at HEAD)
+                                ''').trim()
+                            env.DEPLOY_ENV = "prod"
+                    }
+
+                    if ( build ) {
+                        echo "Building version ${env.DOCKER_VERSION} in ${env.DEPLOY_ENV}"
+                    }
+                    
+                    if ( promote ) {
+                        echo "Promoting version ${env.DOCKER_VERSION} in ${env.DEPLOY_ENV}"
+                    }
+
+                    env.DOCKER_FULL_IMAGE_NAME = "${env.DOCKER_REGISTRY}/${env.DOCKER_NAMESPACE}/${env.DOCKER_IMAGE_NAME}:${env.DOCKER_VERSION}"
+
+                    echo "Docker image name : [${env.DOCKER_FULL_IMAGE_NAME}]"
+                }
+            }
+        }
+        stage ('Launching build pipeline') {
+            when {
+                expression {
+                    return !autoCancelled
+                }
+            }
+            steps {
+                script {
+                    build job: 'auto-build/master', parameters: [
+                        string(name: 'gitBranch', value: "${params.gitBranch}")
+                        string(name: 'gitRepository', value: "${params.gitRepository}")
+                        string(name: 'gitRepositoryCredentials', value: "${params.gitRepositoryCredentials}")
+                        string(name: 'dockerRegistry', value: "${params.dockerRegistry}")
+                        string(name: 'dockerRegistryCredentials', value: "${params.dockerRegistryCredentials}")
+                        string(name: 'dockerNamespace', value: "${params.dockerNamespace}")
+                        string(name: 'dockerImageName', value: "${params.dockerImageName}")
+                        string(name: 'dockerTag', value: "${params.dockerTag}")
+                    ]
+                }
+            }
+        }
+    }
+}
