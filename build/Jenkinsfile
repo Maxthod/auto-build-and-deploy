@@ -162,53 +162,22 @@ pipeline {
                 echo 'Building..'
 
                 script {
-                    sh 'pwd'
-                    sh 'ls -l'
                     sh 'chmod +x ./build/scripts/build.sh'
                     sh 'sudo -E ./build/scripts/build.sh'
                 }
             }
         }
-        stage('Test API') {
+        stage('Test') {
             when {
                 expression {
                     return !autoCancelled
                 }
             }
-            environment {
-                FULL_NAME = "${env.imageName}"
-                DB_NAME = "registry.philippeduval.ca/thehempathy/database"
-            }
             steps {
-                echo 'Not testing..'
+                echo 'Testing ...'
+                echo 'Actually doing nothing.'
                 //sh 'sudo -E ./jenkins/scripts/test.sh'
             }
         }
-        stage('Deploy') {
-            when {
-                expression {
-                    return !autoCancelled
-                }
-            }
-            environment {
-                NOT_JENKINS_URL = "${not_jenkins_addr}/${namespace}-${env.DEPLOY_ENV}/${image_name}"
-            }
-            steps {
-                echo 'Deploying....'
-                //sh 'sudo -E ./jenkins/scripts/deploy.sh'
-            }
-        }
-
-    }
-}
-
-def paramInvalid ( avalue ) {
-    echo "wtf"
-    echo "Invalid is now : ${invalidParam}"
-    invalidParam = true
-    echo "Param ${avalue} was not set"
-    echo "Invalid is now : ${invalidParam}"
-    if ( invalidParam ) {
-        echo "we do are invalid"
     }
 }
