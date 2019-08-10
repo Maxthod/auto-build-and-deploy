@@ -18,7 +18,6 @@ pipeline {
     agent any
 
     parameters {
-        string(name: 'gitBranch', description: 'Git Branch to clone')
         string(name: 'gitRepository', description: 'Git Repository')
         string(name: 'gitRepositoryCredentials', defaultValue: "${default_git_repository_credentials}", description: 'Git Repository Credentials')
 
@@ -35,6 +34,24 @@ pipeline {
 
     }
 
+
+    environment {
+        GIT_REPOSITORY = "${params.gitRepository}"
+        GIT_REPOSITORY_CREDENTIALS = credentials("${params.gitRepositoryCredentials}")
+
+        DOCKER_REGISTRY = "${params.dockerRegistry}"
+        DOCKER_REGISTRY_CREDENTIALS = credentials("${params.dockerRegistryCredentials}")
+
+        DOCKER_NAMESPACE = "${params.dockerNamespace}"
+        DOCKER_IMAGE_NAME = "${params.dockerImageName}"
+
+        DOCKER_STACK_NAME = "${params.dockerStackName}"
+        DOCKER_SERVICE_NAME = "${params.dockerServiceName}"
+
+        NOT_JENKINS_URL = "${params.notJenkinsUrl}"
+        NOT_JENKINS_SECRET = "${params.notJenkinsSecret}"
+
+    }
 
     stages {
         stage ('Validate Parameters') {
