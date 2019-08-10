@@ -67,7 +67,7 @@ pipeline {
             steps {
                 script {
                   
-                    if ( params.gitBranch == "" ) {
+                    if ( !params.gitBranch ) {
                         echo "Fucking hell"
                         paramInvalid("totoAfrica")
                     } else {
