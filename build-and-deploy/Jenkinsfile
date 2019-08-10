@@ -149,12 +149,12 @@ pipeline {
                 script {
                     build job: 'auto-build/master', parameters: [
                         string(name: 'gitBranch', value: "${params.gitBranch}")
-                        string(name: 'gitRepository', value: "${params.gitRepository}")
-                        string(name: 'gitRepositoryCredentials', value: "${params.gitRepositoryCredentials}")
-                        string(name: 'dockerRegistry', value: "${params.dockerRegistry}")
-                        string(name: 'dockerRegistryCredentials', value: "${params.dockerRegistryCredentials}")
-                        string(name: 'dockerNamespace', value: "${params.dockerNamespace}")
-                        string(name: 'dockerImageName', value: "${params.dockerImageName}")
+                        string(name: 'gitRepository', value: "${params.gitRepository}"),
+                        string(name: 'gitRepositoryCredentials', value: "${params.gitRepositoryCredentials}"),
+                        string(name: 'dockerRegistry', value: "${params.dockerRegistry}"),
+                        string(name: 'dockerRegistryCredentials', value: "${params.dockerRegistryCredentials}"),
+                        string(name: 'dockerNamespace', value: "${params.dockerNamespace}"),
+                        string(name: 'dockerImageName', value: "${params.dockerImageName}"),
                         string(name: 'dockerTag', value: "${params.dockerTag}")
                     ]
                 }
