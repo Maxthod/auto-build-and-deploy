@@ -86,6 +86,9 @@ pipeline {
                     echo "validating docker name space"
                     if ( params.dockerNamespace == null ) {
                         echo "ok param is null"
+                    } else {
+                        echo "ok param is not null. what is it then?????????????"
+                        echo params.dockerNamespace
                     }
                     if ( !params.dockerNamespace ) {
                         invalidParam("dockerNamespace")
