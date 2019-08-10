@@ -14,10 +14,6 @@ def autoCancelled = false
 def build = false
 def promote = false
 
-def paramInvalid ( param ) {
-    invalidParam = true
-    echo "Param ${param} was not set"
-}
 pipeline {
     agent any
 
@@ -65,14 +61,7 @@ pipeline {
             steps {
                 script {
                     echo "At least"
-                    if ( !params.gitRepository ) {
-                        invalidParam("gitRepository")
-                    }                 
-
-                    if( invalidParam ) {
-                        echo "Invalid parameters detected. Aborting pipeline..."
-                        autoCancelled = true
-                    }
+                    
                 }
             }
 
