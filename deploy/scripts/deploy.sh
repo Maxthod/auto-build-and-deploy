@@ -3,17 +3,14 @@ set -e
 
 echo "Deploying script ... "
 
-#FULL_NAME="$DOCKER_RE0i#GISTRY"/"$DOCKER_IMAGE_NAME":"$BUILD_VERSION"
+echo "Image Name : $DOCKER_IMAGE_NAME"
+echo "Image tag : $DOCKER_VERSION"
+echo "Not Jenkins Url : $NOT_JENKINS_URL"
 
-echo "$DOCKER_REGISTRY"
-echo "$DOCKER_IMAGE_NAME"
-echo "$VERSION"
-echo "$FULL_NAME"
-
-payload="{\"version\":\"$VERSION\",\"imageName\":\"$FULL_NAME\"}"
+payload="{\"version\":\"$DOCKER_VERSION\",\"imageName\":\"$DOCKER_IMAGE_NAME\"}"
 
 sign(){
-    sign=$(echo -n "$payload" | openssl sha1 -hmac "$SECRET")
+    sign=$(echo -n "$payload" | openssl sha1 -hmac "$NOT_JENKINS_SECRET")
     if [ ${#sign} == 49 ]; then
         sign=${sign#"(stdin)= "}
     fi
