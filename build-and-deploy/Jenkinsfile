@@ -49,9 +49,9 @@ pipeline {
         /*
         GIT_CLONE_DIRECTORY = "${cloneDirectory}"
 
-        GIT_BRANCH = "${params.gitBranch}"
         */
 
+        GIT_BRANCH = "${params.gitBranch}"
         GIT_REPOSITORY = "${params.gitRepository}"
         GIT_REPOSITORY_CREDENTIALS = credentials("${params.gitRepositoryCredentials}")
 
@@ -119,7 +119,6 @@ pipeline {
                 script {
                     def releasePattern = /release\/(.*)/
                     def gitBranchName = "${env.GIT_BRANCH}"
-                    echo "Wut ? ${gitBranchName}"
 
                      switch(gitBranchName) {
                         case "develop":
