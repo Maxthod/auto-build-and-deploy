@@ -27,7 +27,7 @@ pipeline {
         string(name: 'dockerRegistry', defaultValue: "${default_docker_registry}", description: 'Docker Registry')
         string(name: 'dockerRegistryCredentials', defaultValue: "${default_docker_registry_credentials}", description: 'Docker Registry Credentials')
         //string(name: 'dockerNamespace', description: 'Docker Name Space')
-        string(name: 'dockerNamespace', defaultValue: 'totonamespace', description: 'Docker Name Space')
+        string(name: 'dockerNamespace', defaultValue: null, description: 'Docker Name Space')
         //string(name: 'dockerImageName', description: 'The last extension of a docker image name')
         string(name: 'dockerImageName', defaultValue: 'totoimage', description: 'The last extension of a docker image name')
 
