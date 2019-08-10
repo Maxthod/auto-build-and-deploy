@@ -116,7 +116,7 @@ pipeline {
                         paramInvalid("notJenkinsSecret")
                     }   
                     
-                    if( paramInvalid ) {
+                    if( invalidParam ) {
                         echo "Invalid parameters detected. Aborting pipeline..."
                         autoCancelled = true
                     }
