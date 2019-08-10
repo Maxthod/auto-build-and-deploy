@@ -66,69 +66,13 @@ pipeline {
 
             steps {
                 script {
-
                     params.each { key, value ->
-                        if ( !value ) {
+                        if ( !value || value == "" ) {
                             echo "Param ${key} was not set"
                             invalidParam = true
                         }
                     }
-                 /* 
-                    if ( !params.gitBranch ) {
-                        echo "Fucking hell"
-                        paramInvalid("totoAfrica")
-                    } else {
-                        echo "jcomprends rien"
-                    }
-                    if ( params.gitRepository == null || params.gitRepository == "" ) {
-                        paramInvalid("gitRepository")
-                    }   
-                    if ( !params.gitRepositoryCredentials ) {
-                        paramInvalid("gitRepositoryCredentials")
-                    }   
-
-                    if ( !params.dockerRegistry ) {
-                        paramInvalid("dockerRegistry")
-                    }  
-                    if ( !params.dockerRegistryCredentials ) {
-                        paramInvalid("dockerRegistryCredentials")
-                    }   
-                    echo "validating docker name space"
-                    if ( params.dockerNamespace == null ) {
-                        echo "ok param is null"
-                    } else {
-                        echo "ok param is not null. what is it then?????????????"
-                        echo "[${params.dockerNamespace}]"
-                    }
-                    if ( params.dockerNamespace == "" ) {
-                        echo "its a fucking empty string"
-                    }
-                    if ( !params.dockerNamespace ) {
-                        paramInvalid("dockerNamespace")
-                    }   
-                    echo "fuck we did pass through"
-                    if ( !params.dockerImageName ) {
-                        paramInvalid("dockerImageName")
-                    }   
-                    if ( !params.dockerStackName ) {
-                        paramInvalid("dockerStackName")
-                    }   
-                    if ( !params.dockerServiceName ) {
-                        paramInvalid("dockerServiceName")
-                    }   
-                    if ( !params.notJenkinsUrl ) {
-                        paramInvalid("notJenkinsUrl")
-                    }   
-                    if ( !params.notJenkinsSecret ) {
-                        paramInvalid("notJenkinsSecret")
-                    }   
-                   */ 
-
-                    echo "Invalid is now : ${invalidParam}"
-                    if ( invalidParam ) {
-                        echo "we do are invalid"
-                    }
-
+             
                     if ( invalidParam ) {
                         echo "Invalid parameters detected. Aborting pipeline..."
                         autoCancelled = true
@@ -138,6 +82,22 @@ pipeline {
                 }
             }
 
+        }
+
+        stage ('Git Clone') {
+            when {
+                expression {
+                    return !autoCancelled
+                }
+            }
+            steps {
+                script {
+                    def workdir = "workdir"
+                    sh "rm -rf ${workdir}"
+                    sh "git clone https://${env.GIT_REPOSITORY_CREDENTIALS_USR}:${env.GIT_REPOSITORY_CREDENTIALS_PWD}@${env.GIT_REPOSITORY} -b ${env.GIT_BRANCH} ${workdir}"
+                    sh "cd ${workdir}"
+                }
+            }
         }
         stage ('Prepare build') {
             when {
