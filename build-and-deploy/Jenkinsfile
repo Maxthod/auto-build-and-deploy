@@ -150,9 +150,12 @@ pipeline {
             }
             steps {
 
-                build job: 'auto-build/master', parameters: [
-                string(name: 'gitBranch', value: 'totoafrica')
-                ]
+                script {
+
+                    build job: 'auto-build/master', parameters: [
+                    string(name: 'gitBranch', value: 'totoafrica')
+                    ]
+                }
                 /*
                 build job: 'auto-build/master', parameters: [
                     string(name: 'gitBranch', value: "totoafrica"),
