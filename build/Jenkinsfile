@@ -14,11 +14,15 @@ def autoCancelled = false
 def build = false
 def promote = false
 
-
+def paramInvalid ( param ) {
+    invalidParam = true
+    echo "Param ${param} was not set"
+}
 pipeline {
     agent any
 
     parameters {
+        string(name: 'gitBranch', description: 'Git Branch to clone')
         string(name: 'gitRepository', description: 'Git Repository')
         string(name: 'gitRepositoryCredentials', defaultValue: "${default_git_repository_credentials}", description: 'Git Repository Credentials')
 
@@ -62,6 +66,7 @@ pipeline {
                 script {
                     echo "At least"
                     if ( !params.gitRepository ) {
+                        invalidParam("gitRepository")
                     }                 
 
                     if( invalidParam ) {
@@ -73,95 +78,5 @@ pipeline {
 
         }
 
-        stage ('Prepare build') {
-            when {
-                expression {
-                    return !autoCancelled
-                }
-            }
-            steps {
-                script {
-                    def releasePattern = /release\/(.*)/
-                    def gitBranchName = "${env.GIT_BRANCH}"
-
-                     switch(gitBranchName) {
-                        case "develop":
-                            build = true
-                            env.DOCKER_VERSION = "latest"
-                            env.DEPLOY_ENV = "dev"
-                            break
-                        case ~releasePattern:
-                            def matcher = gitBranchName =~ releasePattern
-                            def version = matcher[0][1]
-                            env.DOCKER_VERSION = version
-                            env.DEPLOY_ENV = "stage"
-                            build = true
-                            break
-                        case "master":
-                            promote = true
-                            sh "git remote set-url origin https://${GIT_REPOSITORY_CREDENTIALS_USR}:${GIT_REPOSITORY_CREDENTIALS_PSW}@${GIT_REPOSITORY}"
-                            sh "git fetch --tags > /dev/null"
-                            env.DOCKER_VERSION = sh (returnStdout: true, script: '''
-                                echo $(git tag --points-at HEAD)
-                                ''').trim()
-                            env.DEPLOY_ENV = "prod"
-                    }
-
-                    if ( build ) {
-                        echo "Building version ${env.VERSION} in ${env.DEPLOY_ENV}"
-                    }
-                    
-                    if ( promote ) {
-                        echo "Promoting version ${env.VERSION} in ${env.DEPLOY_ENV}"
-                    }
-
-                    env.DOCKER_FULL_IMAGE_NAME = "${env.DOCKER_REGISTRY}/${env.DOCKER_NAMESPACE}/${env.DOCKER_IMAGE_NAME}:${env.DOCKER_VERSION}"
-                }
-            }
-        }
-        stage('Build') {
-            when {
-                expression {
-                    return !autoCancelled
-                }
-            }
-            steps {
-                echo 'Building..'
-
-                script {
-                    sh 'chmod +x ./jenkins/scripts/build.sh'
-                    sh 'sudo -E ./jenkins/scripts/build.sh'
-                }
-            }
-        }
-        stage('Test API') {
-            when {
-                expression {
-                    return !autoCancelled
-                }
-            }
-            environment {
-                FULL_NAME = "${env.imageName}"
-                DB_NAME = "registry.philippeduval.ca/thehempathy/database"
-            }
-            steps {
-                echo 'Not testing..'
-                //sh 'sudo -E ./jenkins/scripts/test.sh'
-            }
-        }
-        stage('Deploy') {
-            when {
-                expression {
-                    return !autoCancelled
-                }
-            }
-            environment {
-                NOT_JENKINS_URL = "${not_jenkins_addr}/${namespace}-${env.DEPLOY_ENV}/${image_name}"
-            }
-            steps {
-                echo 'Deploying....'
-                //sh 'sudo -E ./jenkins/scripts/deploy.sh'
-            }
-        }
     }
 }
