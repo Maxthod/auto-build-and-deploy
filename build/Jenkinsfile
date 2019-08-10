@@ -9,6 +9,7 @@ def default_not_jenkins_secret = "not_jenkins_token"
 
 
 // Internal variable for pipeline
+def cloneDirectory = "workdir"
 def invalidParam = false
 def autoCancelled = false
 def build = false
@@ -46,6 +47,8 @@ pipeline {
 
 
     environment {
+        GIT_CLONE_DIRECTORY = "${cloneDirectory}"
+
         GIT_BRANCH = "${params.gitBranch}"
         GIT_REPOSITORY = "${params.gitRepository}"
         GIT_REPOSITORY_CREDENTIALS = credentials("${params.gitRepositoryCredentials}")
@@ -95,11 +98,9 @@ pipeline {
             }
             steps {
                 script {
-                    def workdir = "workdir"
+                    def workdir = "${cloneDirectory}"
                     sh "rm -rf ${workdir}"
                     sh "git clone https://${env.GIT_REPOSITORY_CREDENTIALS_USR}:${env.GIT_REPOSITORY_CREDENTIALS_PSW}@${env.GIT_REPOSITORY} -b ${env.GIT_BRANCH} ${workdir}"
-                    sh "cd ${workdir}"
-                    sh "pwd"
                 }
             }
         }
