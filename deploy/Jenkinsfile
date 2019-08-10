@@ -37,7 +37,7 @@ pipeline {
 
         NOT_JENKINS_URL = "${params.notJenkinsUrl}/${params.dockerNamespace}-${params.dockerEnv}/${params.dockerImageName}"
 
-        NOT_JENKINS_SECRET = "${params.notJenkinsSecret}"
+        NOT_JENKINS_SECRET = credentials("${params.notJenkinsSecret}")
 
     }
 
