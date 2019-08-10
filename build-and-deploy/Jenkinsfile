@@ -119,6 +119,7 @@ pipeline {
                 script {
                     def releasePattern = /release\/(.*)/
                     def gitBranchName = "${env.GIT_BRANCH}"
+                    echo "Wut ? ${gitBranchName}"
 
                      switch(gitBranchName) {
                         case "develop":
