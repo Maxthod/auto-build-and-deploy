@@ -116,7 +116,7 @@ pipeline {
                         paramInvalid("notJenkinsSecret")
                     }   
                     
-                    if( invalidParam ) {
+                    if ( invalidParam ) {
                         echo "Invalid parameters detected. Aborting pipeline..."
                         autoCancelled = true
                     }
@@ -222,4 +222,8 @@ def paramInvalid ( avalue ) {
     echo "wtf"
     invalidParam = true
     echo "Param ${avalue} was not set"
+    echo "Invalid is now : ${invalidParam}"
+    if ( invalidParam ) {
+        echo "we do are invalid"
+    }
 }
