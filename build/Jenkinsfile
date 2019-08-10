@@ -43,17 +43,11 @@ pipeline {
 
 
     environment {
-        DOCKER_REGISTRY = "${params.dockerRegistry}"
-        DOCKER_REGISTRY_CREDENTIALS = credentials("${params.dockerRegistryCredentials}")
+        GIT_BRANCH = "${params.gitBranch}"
+        GIT_REPOSITORY = "${params.gitRepository}"
+        GIT_REPOSITORY_CREDENTIALS = credentials("${params.gitRepositoryCredentials}")
 
-        DOCKER_NAMESPACE = "${params.dockerNamespace}"
-        DOCKER_IMAGE_NAME = "${params.dockerImageName}"
 
-        DOCKER_STACK_NAME = "${params.dockerStackName}"
-        DOCKER_SERVICE_NAME = "${params.dockerServiceName}"
-
-        NOT_JENKINS_URL = "${params.notJenkinsUrl}"
-        NOT_JENKINS_SECRET = "${params.notJenkinsSecret}"
 
     }
 
