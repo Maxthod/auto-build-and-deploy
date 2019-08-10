@@ -19,7 +19,6 @@ pipeline {
     agent any
 
     parameters {
-        string(name: 'gitBranch', description: 'Git Branch to clone')
         string(name: 'gitRepository', description: 'Git Repository')
         string(name: 'gitRepositoryCredentials', defaultValue: "${default_git_repository_credentials}", description: 'Git Repository Credentials')
 
