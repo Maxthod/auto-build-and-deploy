@@ -8,24 +8,9 @@ def default_not_jenkins_url = "https://not-jenkins2.thehempathy.com"
 def default_not_jenkins_secret = "not_jenkins_token"
 
 
-// 
-
-def namespace = "thehempathy"
-def image_name = "backend-express"
-
-def not_jenkins_addr = "https://not-jenkins2.thehempathy.com"
-def not_jenkins_secret = "not_jenkins_backend_express_token"
-
-def registry = "registry.philippeduval.ca"
-def registry_credentials = "registry"
-
-
-def git_credentials = "github"
-def git_server = "github.com"
-def git_repo = "thehempathy/backend-express.git"
-def git_url_ssh = "${git_server}:${git_repo}"
-def git_url_http = "${git_server}/${git_repo}"
-
+// Internal variable for pipeline
+def invalidParam = false
+def autoCancelled = false
 def build = false
 def promote = false
 
@@ -33,6 +18,7 @@ pipeline {
     agent any
 
     parameters {
+        string(name: 'gitBranch', description: 'Git Branch to clone')
         string(name: 'gitRepository', description: 'Git Repository')
         string(name: 'gitRepositoryCredentials', defaultValue: "${default_git_repository_credentials}", description: 'Git Repository Credentials')
 
@@ -51,14 +37,22 @@ pipeline {
 
 
     environment {
-        DOCKER_REGISTRY = "${registry}"
-        DOCKER_NAMESPACE = "${namespace}"
-        DOCKER_IMAGE_NAME = "${image_name}"
-        DOCKER_CREDENTIALS = credentials("${registry_credentials}")
-        GITHUB_CREDENTIALS = credentials("${git_credentials}")
-        GITHUB_URL = "${git_url_http}"
-        SECRET = credentials("${not_jenkins_secret}")
-        DOCKER_SERVICE = ""
+        GIT_BRANCH = "${params.gitBranch}"
+        GIT_REPOSITORY = "${params.gitRepository}"
+        GIT_REPOSITORY_CREDENTIALS = credentials("${params.gitRepositoryCredentials}")
+
+        DOCKER_REGISTRY = "${params.dockerRegistry}"
+        DOCKER_REGISTRY_CREDENTIALS = credentials("${params.dockerRegistryCredentials}")
+
+        DOCKER_NAMESPACE = "${params.dockerNamespace}"
+        DOCKER_IMAGE_NAME = "${params.dockerImageName}"
+
+        DOCKER_STACK_NAME = "${params.dockerStackName}"
+        DOCKER_SERVICE_NAME = "${params.dockerServiceName}"
+
+        NOT_JENKINS_URL = "${params.notJenkinsUrl}"
+        NOT_JENKINS_SECRET = "${params.notJenkinsSecret}"
+
     }
 
     stages {
@@ -66,17 +60,13 @@ pipeline {
 
             steps {
                 script {
-                    if ( params.gitRepository == null ) {
-                        echo "Is was null"
-                        sh 'exit 1'
-                    } else if( !params.gitRepository ) {
-                        echo "it as not oijerg"
-                        sh 'exit 1'
-                    }
-                    else {
-                        echo "it wasnt"
-                        echo "${params.gitRepository}"
-                        sh 'exit 1'
+                    if ( !params.gitRepository ) {
+                        invalidParam("gitRepository")
+                    }                 
+
+                    if( invalidParam ) {
+                        echo "Invalid parameters detected. Aborting pipeline..."
+                        autoCancelled = true
                     }
                 }
             }
@@ -84,28 +74,34 @@ pipeline {
         }
 
         stage ('Prepare build') {
+            when {
+                expression {
+                    return !autoCancelled
+                }
+            }
             steps {
                 script {
                     def releasePattern = /release\/(.*)/
+                    def gitBranchName = "${env.GIT_BRANCH}"
 
-                     switch(BRANCH_NAME) {
+                     switch(gitBranchName) {
                         case "develop":
                             build = true
-                            env.VERSION = "latest"
+                            env.DOCKER_VERSION = "latest"
                             env.DEPLOY_ENV = "dev"
                             break
                         case ~releasePattern:
-                            def matcher = BRANCH_NAME =~ releasePattern
+                            def matcher = gitBranchName =~ releasePattern
                             def version = matcher[0][1]
-                            env.VERSION = version
+                            env.DOCKER_VERSION = version
                             env.DEPLOY_ENV = "stage"
                             build = true
                             break
                         case "master":
                             promote = true
-                            sh "git remote set-url origin https://${GITHUB_CREDENTIALS_USR}:${GITHUB_CREDENTIALS_PSW}@${GITHUB_URL}"
+                            sh "git remote set-url origin https://${GIT_REPOSITORY_CREDENTIALS_USR}:${GIT_REPOSITORY_CREDENTIALS_PSW}@${GIT_REPOSITORY}"
                             sh "git fetch --tags > /dev/null"
-                            env.VERSION = sh (returnStdout: true, script: '''
+                            env.DOCKER_VERSION = sh (returnStdout: true, script: '''
                                 echo $(git tag --points-at HEAD)
                                 ''').trim()
                             env.DEPLOY_ENV = "prod"
@@ -119,31 +115,31 @@ pipeline {
                         echo "Promoting version ${env.VERSION} in ${env.DEPLOY_ENV}"
                     }
 
-                    env.FULL_NAME = "${DOCKER_REGISTRY}/${DOCKER_NAMESPACE}/${DOCKER_IMAGE_NAME}:${VERSION}"
+                    env.DOCKER_FULL_IMAGE_NAME = "${env.DOCKER_REGISTRY}/${env.DOCKER_NAMESPACE}/${env.DOCKER_IMAGE_NAME}:${env.DOCKER_VERSION}"
                 }
             }
         }
         stage('Build') {
             when {
                 expression {
-                    return build
+                    return !autoCancelled
                 }
-            }
-            environment {
-                BUILD_VERSION = "${VERSION}"
-                FULL_NAME = "${DOCKER_REGISTRY}/${DOCKER_NAMESPACE}/${DOCKER_IMAGE_NAME}:${VERSION}"
             }
             steps {
                 echo 'Building..'
 
                 script {
-                    env.imageName = "${FULL_NAME}"
                     sh 'chmod +x ./jenkins/scripts/build.sh'
                     sh 'sudo -E ./jenkins/scripts/build.sh'
                 }
             }
         }
         stage('Test API') {
+            when {
+                expression {
+                    return !autoCancelled
+                }
+            }
             environment {
                 FULL_NAME = "${env.imageName}"
                 DB_NAME = "registry.philippeduval.ca/thehempathy/database"
@@ -153,15 +149,24 @@ pipeline {
                 //sh 'sudo -E ./jenkins/scripts/test.sh'
             }
         }
-
         stage('Deploy') {
+            when {
+                expression {
+                    return !autoCancelled
+                }
+            }
             environment {
                 NOT_JENKINS_URL = "${not_jenkins_addr}/${namespace}-${env.DEPLOY_ENV}/${image_name}"
             }
             steps {
                 echo 'Deploying....'
-                sh 'sudo -E ./jenkins/scripts/deploy.sh'
+                //sh 'sudo -E ./jenkins/scripts/deploy.sh'
             }
         }
     }
+}
+
+def paramInvalid ( param ) {
+    invalidParam = true
+    echo "Param ${param} was not set"
 }
