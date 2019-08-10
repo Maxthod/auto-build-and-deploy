@@ -21,7 +21,8 @@ pipeline {
         //string(name: 'gitBranch', description: 'Git Branch to clone')
         string(name: 'gitBranch', defaultValue: 'develop', description: 'Git Branch to clone')
         //string(name: 'gitRepository', description: 'Git Repository')
-        string(name: 'gitRepository', defaultValue:'toto.git', description: 'Git Repository')
+        string(name: 'gitRepository', defaultValue:'github.com:thehempathy/backend-express.git', description: 'Git Repository')
+        
         string(name: 'gitRepositoryCredentials', defaultValue: "${default_git_repository_credentials}", description: 'Git Repository Credentials')
 
         string(name: 'dockerRegistry', defaultValue: "${default_docker_registry}", description: 'Docker Registry')
@@ -94,7 +95,7 @@ pipeline {
                 script {
                     def workdir = "workdir"
                     sh "rm -rf ${workdir}"
-                    sh "git clone https://${env.GIT_REPOSITORY_CREDENTIALS_USR}:${env.GIT_REPOSITORY_CREDENTIALS_PWD}@${env.GIT_REPOSITORY} -b ${env.GIT_BRANCH} ${workdir}"
+                    sh "git clone https://${env.GIT_REPOSITORY_CREDENTIALS_USR}:${env.GIT_REPOSITORY_CREDENTIALS_PSW}@${env.GIT_REPOSITORY} -b ${env.GIT_BRANCH} ${workdir}"
                     sh "cd ${workdir}"
                 }
             }
