@@ -1,5 +1,11 @@
 #!/bin/sh
 set -e
+
+echo "Testing"
+pwd
+ls -l
+
+
 echo "Building ..."
 echo "Docker Registry : $DOCKER_REGISTRY"
 echo "Docker Image Name : $DOCKER_FULL_IMAGE_NAME"
