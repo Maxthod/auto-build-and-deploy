@@ -21,7 +21,7 @@ pipeline {
         //string(name: 'gitBranch', description: 'Git Branch to clone')
         string(name: 'gitBranch', defaultValue: 'develop', description: 'Git Branch to clone')
         //string(name: 'gitRepository', description: 'Git Repository')
-        string(name: 'gitRepository', defaultValue:'github.com:thehempathy/backend-express.git', description: 'Git Repository')
+        string(name: 'gitRepository', defaultValue:'github.com/thehempathy/backend-express.git', description: 'Git Repository')
         
         string(name: 'gitRepositoryCredentials', defaultValue: "${default_git_repository_credentials}", description: 'Git Repository Credentials')
 
