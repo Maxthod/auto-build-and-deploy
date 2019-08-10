@@ -160,8 +160,8 @@ pipeline {
                 echo 'Building..'
 
                 script {
-                    sh 'chmod +x ./jenkins/scripts/build.sh'
-                    sh 'sudo -E ./jenkins/scripts/build.sh'
+                    sh 'chmod +x ./build/scripts/build.sh'
+                    sh 'sudo -E ./build/scripts/build.sh'
                 }
             }
         }
