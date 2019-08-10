@@ -67,10 +67,10 @@ pipeline {
             steps {
                 script {
                   
-                    if ( !params.gitBranch ) {
+                    if ( params.gitBranch == null || params.gitBranch == "" ) {
                         invalidParam("gitBranch")
                     }                 
-                    if ( !params.gitRepository ) {
+                    if ( params.gitRepository == null || params.gitRepository == "" ) {
                         invalidParam("gitRepository")
                     }   
                     if ( !params.gitRepositoryCredentials ) {
