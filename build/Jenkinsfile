@@ -131,7 +131,7 @@ pipeline {
 
                     if ( invalidParam ) {
                         echo "Invalid parameters detected. Aborting pipeline..."
-                        autoCancelled = true
+                      //  autoCancelled = true
                         currentBuild.result = 'ABORTED'
 
                     }
