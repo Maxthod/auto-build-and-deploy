@@ -11,6 +11,12 @@ pipeline {
     agent any
 
     parameters {
+        //string(name: 'dockerNamespace', description: 'Docker Name Space')
+        string(name: 'dockerNamespace', defaultValue: 'thehempathy', description: 'Docker Name Space')
+
+        //string(name: 'dockerEnv', description: 'The environment to deploy to.')
+        string(name: 'dockerEnv', defaultValue: 'dev', description: 'The last extension of a docker image name')
+
         //string(name: 'dockerImageName', description: 'The last extension of a docker image name')
         string(name: 'dockerImageName', defaultValue: 'backend-express', description: 'The last extension of a docker image name')
 
@@ -29,7 +35,8 @@ pipeline {
 
         DOCKER_VERSION = "${params.dockerTag}"
 
-        NOT_JENKINS_URL = "${params.notJenkinsUrl}"
+        NOT_JENKINS_URL = "${params.notJenkinsUrl}/${params.dockerNamespace}-${params.dockerEnv}/${params.dockerImageName}"
+
         NOT_JENKINS_SECRET = "${params.notJenkinsSecret}"
 
     }
