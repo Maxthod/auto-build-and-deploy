@@ -69,10 +69,11 @@ pipeline {
 
                     params.each { key, value ->
                         if ( !value ) {
-                            echo "${key} was not set"
+                            echo "Param ${key} was not set"
+                            invalidParam = true
                         }
                     }
-                  
+                 /* 
                     if ( !params.gitBranch ) {
                         echo "Fucking hell"
                         paramInvalid("totoAfrica")
@@ -121,7 +122,7 @@ pipeline {
                     if ( !params.notJenkinsSecret ) {
                         paramInvalid("notJenkinsSecret")
                     }   
-                    
+                   */ 
 
                     echo "Invalid is now : ${invalidParam}"
                     if ( invalidParam ) {
