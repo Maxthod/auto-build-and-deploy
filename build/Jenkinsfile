@@ -90,6 +90,9 @@ pipeline {
                         echo "ok param is not null. what is it then?????????????"
                         echo "[${params.dockerNamespace}]"
                     }
+                    if ( params.dockerNamespace == "" ) {
+                        echo "its a fucking empty string"
+                    }
                     if ( !params.dockerNamespace ) {
                         invalidParam("dockerNamespace")
                     }   
