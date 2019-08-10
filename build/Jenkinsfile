@@ -68,8 +68,11 @@ pipeline {
                 script {
                   
                     if ( params.gitBranch == "" ) {
-                        invalidParam("gitBranch")
-                    }                 
+                        echo "Fucking hell"
+                        //invalidParam("gitBranch")
+                    } else {
+                        echo "jcomprends rien"
+                    }
                     if ( params.gitRepository == null || params.gitRepository == "" ) {
                         invalidParam("gitRepository")
                     }   
