@@ -151,6 +151,17 @@ pipeline {
             steps {
                 script {
                     build job: 'auto-build/master', parameters: [
+                        string(name: 'gitBranch', value: 'totoafrica'),
+                        string(name: 'gitRepository', value: "totorepo"),
+                        string(name: 'gitRepositoryCredentials', value: "totorepocred"),
+                        string(name: 'dockerRegistry', value: "totodockeregis"),
+                        string(name: 'dockerRegistryCredentials', value: "totoregiscred"),
+                        string(name: 'dockerNamespace', value: "totoDockNam"),
+                        string(name: 'dockerImageName', value: "totoImageName"),
+                        string(name: 'dockerTag', value: "totoDockerTag")
+                    ]
+                    /*
+                    build job: 'auto-build/master', parameters: [
                         string(name: 'gitBranch', value: "'" + "${params.gitBranch}" + "'"),
                         string(name: 'gitRepository', value: "${params.gitRepository}"),
                         string(name: 'gitRepositoryCredentials', value: "${params.gitRepositoryCredentials}"),
@@ -160,6 +171,7 @@ pipeline {
                         string(name: 'dockerImageName', value: "${params.dockerImageName}"),
                         string(name: 'dockerTag', value: "${params.dockerTag}")
                     ]
+                    */
                 }
             }
         }
