@@ -12,8 +12,8 @@ def default_not_jenkins_secret = "not_jenkins_token"
 def cloneDirectory = "workdir"
 def invalidParam = false
 def autoCancelled = false
-def build = false
-def promote = false
+def doBuild = false
+def doPromote = false
 
 pipeline {
     agent any
@@ -107,7 +107,7 @@ pipeline {
 
                      switch(gitBranchName) {
                         case "develop":
-                            build = true
+                            doBuild = true
                             env.DOCKER_VERSION = "latest"
                             env.DEPLOY_ENV = "dev"
                             break
@@ -116,10 +116,10 @@ pipeline {
                             def version = matcher[0][1]
                             env.DOCKER_VERSION = version
                             env.DEPLOY_ENV = "stage"
-                            build = true
+                            doBuild = true
                             break
                         case "master":
-                            promote = true
+                            doPromote = true
                             sh "git remote set-url origin https://${GIT_REPOSITORY_CREDENTIALS_USR}:${GIT_REPOSITORY_CREDENTIALS_PSW}@${GIT_REPOSITORY}"
                             sh "git fetch --tags > /dev/null"
                             env.DOCKER_VERSION = sh (returnStdout: true, script: '''
@@ -128,11 +128,11 @@ pipeline {
                             env.DEPLOY_ENV = "prod"
                     }
 
-                    if ( build ) {
+                    if ( doBuild ) {
                         echo "Building version ${env.DOCKER_VERSION} in ${env.DEPLOY_ENV}"
                     }
                     
-                    if ( promote ) {
+                    if ( doPromote ) {
                         echo "Promoting version ${env.DOCKER_VERSION} in ${env.DEPLOY_ENV}"
                     }
 
