@@ -149,7 +149,6 @@ pipeline {
                 }
             }
             steps {
-                script {
 
                     build job: 'auto-build/master', parameters: [
                         string(name: 'gitBranch', value: 'totoafrica')
@@ -178,7 +177,6 @@ pipeline {
                         string(name: 'dockerTag', value: "${params.dockerTag}")
                     ]
                     */
-                }
             }
         }
     }
