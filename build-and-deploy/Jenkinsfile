@@ -185,7 +185,7 @@ pipeline {
                         string(name: 'dockerRegistryCredentials', value: "${params.dockerRegistryCredentials}"),
                         string(name: 'dockerNamespace', value: "${params.dockerNamespace}"),
                         string(name: 'dockerImageName', value: "${params.dockerImageName}"),
-                        string(name: 'dockerTag', value: "${params.dockerTag}")
+                        string(name: 'dockerTag', value: "${env.DOCKER_VERSION}")
                     ]
                 }
                 /*
