@@ -31,12 +31,12 @@ pipeline {
         //string(name: 'dockerRegistryCredentials', defaultValue: "${default_docker_registry_credentials}", description: 'Docker Registry Credentials')
         string(name: 'dockerRegistryCredentials', defaultValue: "docker_registry_philippeduval_ca_credentials", description: 'Docker Registry Credentials')
         //string(name: 'dockerNamespace', description: 'Docker Name Space')
-        string(name: 'dockerNamespace', defaultValue: 'thehempathy', description: 'Docker Name Space')
+//        string(name: 'dockerNamespace', defaultValue: 'thehempathy', description: 'Docker Name Space')
         //string(name: 'dockerImageName', description: 'The last extension of a docker image name')
-        string(name: 'dockerImageName', defaultValue: 'backend-express', description: 'The last extension of a docker image name')
+        string(name: 'dockerImage', description: 'The Docker Image')
         
         //string(name: 'dockerTag', description: 'The Docker Tag to be build')
-        string(name: 'dockerTag', defaultValue: 'latest', description: 'The last extension of a docker image name')
+//        string(name: 'dockerTag', defaultValue: 'latest', description: 'The last extension of a docker image name')
 
     }
 
@@ -51,11 +51,12 @@ pipeline {
         DOCKER_REGISTRY = "${params.dockerRegistry}"
         DOCKER_REGISTRY_CREDENTIALS = credentials("${params.dockerRegistryCredentials}")
 
-        DOCKER_NAMESPACE = "${params.dockerNamespace}"
-        DOCKER_IMAGE_NAME = "${params.dockerImageName}"
-        DOCKER_VERSION = "${params.dockerTag}"
+//        DOCKER_NAMESPACE = "${params.dockerNamespace}"
+//        DOCKER_IMAGE_NAME = "${params.dockerImageName}"
+//        DOCKER_VERSION = "${params.dockerTag}"
 
-        DOCKER_FULL_IMAGE_NAME = "${env.DOCKER_REGISTRY}/${env.DOCKER_NAMESPACE}/${env.DOCKER_IMAGE_NAME}:${env.DOCKER_VERSION}"
+        DOCKER_IMAGE= "${params.dockerImage}"
+//        DOCKER_FULL_IMAGE_NAME = "${env.DOCKER_REGISTRY}/${env.DOCKER_NAMESPACE}/${env.DOCKER_IMAGE_NAME}:${env.DOCKER_VERSION}"
 
     }
 

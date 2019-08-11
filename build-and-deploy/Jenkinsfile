@@ -162,7 +162,7 @@ pipeline {
                         echo "Promoting version ${env.DOCKER_VERSION} in ${env.DEPLOY_ENV}"
                     }
 
-                    env.DOCKER_FULL_IMAGE_NAME = "${env.DOCKER_REGISTRY}/${env.DOCKER_NAMESPACE}/${env.DOCKER_IMAGE_NAME}:${env.DOCKER_VERSION}"
+                    env.DOCKER_FULL_IMAGE_NAME = "${params.dockerRegistry}/${params.dockerNamespace}/${params.dockerImageName}:${env.DOCKER_VERSION}"
 
                     echo "Docker image name : [${env.DOCKER_FULL_IMAGE_NAME}]"
                 }
@@ -183,9 +183,9 @@ pipeline {
                         string(name: 'gitRepositoryCredentials', value: "${params.gitRepositoryCredentials}"),
                         string(name: 'dockerRegistry', value: "${params.dockerRegistry}"),
                         string(name: 'dockerRegistryCredentials', value: "${params.dockerRegistryCredentials}"),
-                        string(name: 'dockerNamespace', value: "${params.dockerNamespace}"),
-                        string(name: 'dockerImageName', value: "${params.dockerImageName}"),
-                        string(name: 'dockerTag', value: "${env.DOCKER_VERSION}")
+//                        string(name: 'dockerNamespace', value: "${params.dockerNamespace}"),
+                        string(name: 'dockerImage', value: "${env.DOCKER_FULL_IMAGE_NAME}"),
+//                        string(name: 'dockerTag', value: "${env.DOCKER_VERSION}")
                     ]
                 }
               
@@ -204,6 +204,7 @@ pipeline {
                         string(name: 'dockerNamespace', value: "${params.dockerNamespace}"),
                         string(name: 'dockerEnv', value: "${env.DEPLOY_ENV}"),
                         string(name: 'dockerImageName', value: "${params.dockerImageName}"),
+                        string(name: 'dockerImage', value: "${env.DOCKER_FULL_IMAGE_NAME}"),
                         string(name: 'dockerTag', value: "${env.DOCKER_VERSION}"),
                         string(name: 'dockerStackName', value: "${params.dockerStackName}"),
                         string(name: 'dockerServiceName', value: "${params.dockerServiceName}"),

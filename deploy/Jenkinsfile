@@ -18,7 +18,8 @@ pipeline {
         string(name: 'dockerEnv', defaultValue: 'dev', description: 'The last extension of a docker image name')
 
         //string(name: 'dockerImageName', description: 'The last extension of a docker image name')
-        string(name: 'dockerImageName', defaultValue: 'backend-express', description: 'The last extension of a docker image name')
+        string(name: 'dockerImageName', description: 'The last extension of a docker image name')
+        string(name: 'dockerImage', description: 'The last extension of a docker image name')
 
         //string(name: 'dockerTag', description: 'The Docker Tag to be deploy')
         string(name: 'dockerTag', defaultValue: 'latest', description: 'The last extension of a docker image name')
@@ -36,11 +37,12 @@ pipeline {
 
     environment {
 
-        DOCKER_IMAGE_NAME = "${params.dockerImageName}"
+
+        DOCKER_IMAGE = "${params.dockerImage}"
 
         DOCKER_VERSION = "${params.dockerTag}"
 
-        NOT_JENKINS_URL = "${params.notJenkinsUrl}/${params.dockerNamespace}-${params.dockerEnv}/${params.dockerImageName}"
+        NOT_JENKINS_URL = "${params.notJenkinsAddr}/${params.dockerNamespace}-${params.dockerEnv}/${params.dockerImageName}"
 
         NOT_JENKINS_SECRET = credentials("${params.notJenkinsSecret}")
 
