@@ -208,7 +208,7 @@ pipeline {
                         string(name: 'dockerStackName', value: "${params.dockerStackName}"),
                         string(name: 'dockerServiceName', value: "${params.dockerServiceName}"),
                         string(name: 'notJenkinsAddr', value: "${params.notJenkinsAddr}"),
-                        string(name: 'notJenkinsSecret', value: "${params.notJenkinsSecret}"),
+                        string(name: 'notJenkinsSecret', value: "${params.notJenkinsSecret}")
                     ]
                 }
               
