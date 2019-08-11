@@ -1,5 +1,5 @@
 // Default Paramaters
-def default_not_jenkins_url = "https://not-jenkins2.thehempathy.com"
+def default_not_jenkins_addr = "https://not-jenkins2.thehempathy.com"
 def default_not_jenkins_secret = "not_jenkins_token"
 
 
@@ -23,7 +23,12 @@ pipeline {
         //string(name: 'dockerTag', description: 'The Docker Tag to be deploy')
         string(name: 'dockerTag', defaultValue: 'latest', description: 'The last extension of a docker image name')
 
-        string(name: 'notJenkinsUrl', defaultValue: "${default_not_jenkins_url}", description: 'Not Jenkins Url')
+        //string(name: 'dockerStackName', description: 'Docker Stack Name to deploy to')
+        string(name: 'dockerStackName', defaultValue: 'thehempathy', description: 'Docker Stack Name to deploy to')
+        //string(name: 'dockerServiceName', description: 'Docker Service Name to deploy to')
+        string(name: 'dockerServiceName', defaultValue: 'backend_express', description: 'Docker Service Name to deploy to')
+
+        string(name: 'notJenkinsAddr', defaultValue: "${default_not_jenkins_addr}", description: 'Not Jenkins Base Url')
         string(name: 'notJenkinsSecret', defaultValue: "${default_not_jenkins_secret}", description: 'Not Jenkins secret')
 
     }

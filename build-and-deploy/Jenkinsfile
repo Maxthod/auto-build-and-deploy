@@ -4,7 +4,7 @@ def default_git_repository_credentials = "git_repository_credentials"
 def default_docker_registry = "registry.hub.docker.com"
 def default_docker_registry_credentials = "docker_registry_credentials"
 
-def default_not_jenkins_url = "https://not-jenkins2.thehempathy.com"
+def default_not_jenkins_addr = "https://not-jenkins2.thehempathy.com"
 def default_not_jenkins_secret = "not_jenkins_token"
 
 
@@ -40,7 +40,7 @@ pipeline {
         //string(name: 'dockerServiceName', description: 'Docker Service Name to deploy to')
         string(name: 'dockerServiceName', defaultValue: 'backend_express', description: 'Docker Service Name to deploy to')
 
-        string(name: 'notJenkinsUrl', defaultValue: "${default_not_jenkins_url}", description: 'Not Jenkins Url')
+        string(name: 'notJenkinsAddr', defaultValue: "${default_not_jenkins_addr}", description: 'Not Jenkins Base Url')
         string(name: 'notJenkinsSecret', defaultValue: "${default_not_jenkins_secret}", description: 'Not Jenkins secret')
 
     }
@@ -188,30 +188,30 @@ pipeline {
                         string(name: 'dockerTag', value: "${env.DOCKER_VERSION}")
                     ]
                 }
-                /*
-                build job: 'auto-build/master', parameters: [
-                    string(name: 'gitBranch', value: "totoafrica"),
-                    string(name: 'gitRepository', value: "totorepo"),
-                    string(name: 'gitRepositoryCredentials', value: "totorepocred"),
-                    string(name: 'dockerRegistry', value: "totodockeregis"),
-                    string(name: 'dockerRegistryCredentials', value: "totoregiscred"),
-                    string(name: 'dockerNamespace', value: "totoDockNam"),
-                    string(name: 'dockerImageName', value: "totoImageName"),
-                    string(name: 'dockerTag', value: "totoDockerTag")
-                ]
-                */
-                /*
+              
+            }
+        }
+        stage ('Launching deploy pipeline') {
+            when {
+                expression {
+                    return !autoCancelled
+                }
+            }
+            steps {
 
-
-
-
-
-
-
-
-
-
-                */
+                script {
+                    build job: 'auto-deploy', parameters: [
+                        string(name: 'dockerNamespace', value: "${params.dockerNamespace}"),
+                        string(name: 'dockerEnv', value: "${env.DEPLOY_ENV}"),
+                        string(name: 'dockerImageName', value: "${params.dockerImageName}"),
+                        string(name: 'dockerTag', value: "${env.DOCKER_VERSION}")
+                        string(name: 'dockerStackName', value: "${params.dockerStackName}"),
+                        string(name: 'dockerServiceName', value: "${params.dockerServiceName}"),
+                        string(name: 'notJenkinsAddr', value: "${params.notJenkinsAddr}"),
+                        string(name: 'notJenkinsSecret', value: "${params.notJenkinsSecret}"),
+                    ]
+                }
+              
             }
         }
     }
