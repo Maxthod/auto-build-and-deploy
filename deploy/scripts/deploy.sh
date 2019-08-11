@@ -18,8 +18,9 @@ sign(){
 }
 
 makeCurl(){
-    echo "Curling : $NOT_JENKINS_URL"
-    echo "Payload : $payload"
+    echo "Curling ..."
+    echo "Url : [$NOT_JENKINS_URL]"
+    echo "Payload : [$payload]"
 
     while read data; do
         echo "Signature : $data"

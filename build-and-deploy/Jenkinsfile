@@ -201,12 +201,10 @@ pipeline {
 
                 script {
                     build job: 'auto-deploy/master', parameters: [
-                        string(name: 'dockerNamespace', value: "${params.dockerNamespace}"),
-                        string(name: 'dockerEnv', value: "${env.DEPLOY_ENV}"),
-                        string(name: 'dockerImageName', value: "${params.dockerImageName}"),
                         string(name: 'dockerImage', value: "${env.DOCKER_FULL_IMAGE_NAME}"),
                         string(name: 'dockerTag', value: "${env.DOCKER_VERSION}"),
                         string(name: 'dockerStackName', value: "${params.dockerStackName}"),
+                        string(name: 'dockerEnv', value: "${env.DEPLOY_ENV}"),
                         string(name: 'dockerServiceName', value: "${params.dockerServiceName}"),
                         string(name: 'notJenkinsAddr', value: "${params.notJenkinsAddr}"),
                         string(name: 'notJenkinsSecret', value: "${params.notJenkinsSecret}")

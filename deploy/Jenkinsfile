@@ -12,13 +12,11 @@ pipeline {
 
     parameters {
         //string(name: 'dockerNamespace', description: 'Docker Name Space')
-        string(name: 'dockerNamespace', defaultValue: 'thehempathy', description: 'Docker Name Space')
+//        string(name: 'dockerNamespace', defaultValue: 'thehempathy', description: 'Docker Name Space')
 
-        //string(name: 'dockerEnv', description: 'The environment to deploy to.')
-        string(name: 'dockerEnv', defaultValue: 'dev', description: 'The last extension of a docker image name')
 
         //string(name: 'dockerImageName', description: 'The last extension of a docker image name')
-        string(name: 'dockerImageName', description: 'The last extension of a docker image name')
+//        string(name: 'dockerImageName', description: 'The last extension of a docker image name')
         string(name: 'dockerImage', description: 'The last extension of a docker image name')
 
         //string(name: 'dockerTag', description: 'The Docker Tag to be deploy')
@@ -26,6 +24,8 @@ pipeline {
 
         //string(name: 'dockerStackName', description: 'Docker Stack Name to deploy to')
         string(name: 'dockerStackName', defaultValue: 'thehempathy', description: 'Docker Stack Name to deploy to')
+        //string(name: 'dockerEnv', description: 'The environment to deploy to.')
+        string(name: 'dockerEnv', defaultValue: 'dev', description: 'The last extension of a docker image name')
         //string(name: 'dockerServiceName', description: 'Docker Service Name to deploy to')
         string(name: 'dockerServiceName', defaultValue: 'backend_express', description: 'Docker Service Name to deploy to')
 
