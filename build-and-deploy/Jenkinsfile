@@ -155,11 +155,11 @@ pipeline {
                     }
 
                     if ( doBuild ) {
-                        echo "Building version ${env.DOCKER_VERSION} in ${env.DEPLOY_ENV}"
+                        echo "Building version [${env.DOCKER_VERSION}] in [${env.DEPLOY_ENV}]"
                     }
                     
                     if ( doPromote ) {
-                        echo "Promoting version ${env.DOCKER_VERSION} in ${env.DEPLOY_ENV}"
+                        echo "Promoting version [${env.DOCKER_VERSION}] in [${env.DEPLOY_ENV}]"
                     }
 
                     env.DOCKER_FULL_IMAGE_NAME = "${params.dockerRegistry}/${params.dockerNamespace}/${params.dockerImageName}:${env.DOCKER_VERSION}"

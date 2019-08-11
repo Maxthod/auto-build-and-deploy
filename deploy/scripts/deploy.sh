@@ -3,11 +3,11 @@ set -e
 
 echo "Deploying script ... "
 
-echo "Image Name : $DOCKER_IMAGE_NAME"
-echo "Image tag : $DOCKER_VERSION"
-echo "Not Jenkins Url : $NOT_JENKINS_URL"
+echo "Image Name : [$DOCKER_IMAGE]"
+echo "Image tag : [$DOCKER_VERSION]"
+echo "Not Jenkins Url : [$NOT_JENKINS_URL]"
 
-payload="{\"version\":\"$DOCKER_VERSION\",\"imageName\":\"$DOCKER_IMAGE_NAME\"}"
+payload="{\"version\":\"$DOCKER_VERSION\",\"imageName\":\"$DOCKER_IMAGE\"}"
 
 sign(){
     sign=$(echo -n "$payload" | openssl sha1 -hmac "$NOT_JENKINS_SECRET")
