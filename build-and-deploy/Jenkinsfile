@@ -138,15 +138,16 @@ pipeline {
                             def workdir = "${cloneDirectory}"
                             sh "rm -rf ${workdir}"
                             sh "git clone https://${env.GIT_REPOSITORY_CREDENTIALS_USR}:${env.GIT_REPOSITORY_CREDENTIALS_PSW}@${env.GIT_REPOSITORY} -b ${env.GIT_BRANCH} ${workdir}"
-                            sh "cd ${workdir}"
-                            sh "git tag"
-                            sh "git log | head -n 20"
-                            sh "git remote set-url origin https://${GIT_REPOSITORY_CREDENTIALS_USR}:${GIT_REPOSITORY_CREDENTIALS_PSW}@${GIT_REPOSITORY}"
-                            sh "git fetch --tags > /dev/null"
-                            sh "git tag"
-                            env.DOCKER_VERSION = sh (returnStdout: true, script: '''
+//                            sh "cd ${workdir}"
+//                            sh "git tag"
+//                            sh "git log | head -n 20"
+//                            sh "git remote set-url origin https://${GIT_REPOSITORY_CREDENTIALS_USR}:${GIT_REPOSITORY_CREDENTIALS_PSW}@${GIT_REPOSITORY}"
+//                            sh "git tag"
+                            env.DOCKER_VERSION = sh (returnStdout: true, script: """
+                                cd ${workdir}
+                                git fetch --tags > /dev/null
                                 echo $(git tag --points-at HEAD)
-                                ''').trim()
+                            """).trim()
                             env.DEPLOY_ENV = "prod"
                         default:
                             echo "Unknown branch. Aborting pipeline..."
