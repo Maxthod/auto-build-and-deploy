@@ -42,7 +42,7 @@ pipeline {
 
         DOCKER_VERSION = "${params.dockerTag}"
 
-        NOT_JENKINS_URL = "${params.notJenkinsAddr}/${params.dockerNamespace}-${params.dockerEnv}/${params.dockerImageName}"
+        NOT_JENKINS_URL = "${params.notJenkinsAddr}/${params.dockerStackName}-${params.dockerEnv}/${params.dockerServiceName}"
 
         NOT_JENKINS_SECRET = credentials("${params.notJenkinsSecret}")
 

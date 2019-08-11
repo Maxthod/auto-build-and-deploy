@@ -2,8 +2,8 @@
 set -e
 
 echo "Building script ..."
-echo "Docker Registry : $DOCKER_REGISTRY"
-echo "Docker Image Name : $DOCKER_IMAGE"
+echo "Docker Registry : [$DOCKER_REGISTRY]"
+echo "Docker Image Name : [$DOCKER_IMAGE]"
 
 echo "$DOCKER_REGISTRY_CREDENTIALS_PSW" | docker login --username "$DOCKER_REGISTRY_CREDENTIALS_USR" --password-stdin "$DOCKER_REGISTRY"
 
