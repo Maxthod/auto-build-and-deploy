@@ -144,7 +144,7 @@ pipeline {
 //                            sh "git remote set-url origin https://${GIT_REPOSITORY_CREDENTIALS_USR}:${GIT_REPOSITORY_CREDENTIALS_PSW}@${GIT_REPOSITORY}"
 //                            sh "git tag"
                             env.DOCKER_VERSION = sh (returnStdout: true, script: """
-                                cd ${workdir}
+                                cd \${workdir}
                                 git fetch --tags > /dev/null
                                 echo $(git tag --points-at HEAD)
                             """).trim()
