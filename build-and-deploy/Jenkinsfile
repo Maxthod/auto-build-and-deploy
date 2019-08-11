@@ -146,7 +146,7 @@ pipeline {
                             env.DOCKER_VERSION = sh (returnStdout: true, script: """
                                 cd \${workdir}
                                 git fetch --tags > /dev/null
-                                echo $(git tag --points-at HEAD)
+                                echo \$(git tag --points-at HEAD)
                             """).trim()
                             env.DEPLOY_ENV = "prod"
                         default:
