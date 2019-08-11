@@ -200,7 +200,7 @@ pipeline {
             steps {
 
                 script {
-                    build job: 'auto-deploy', parameters: [
+                    build job: 'auto-deploy/master', parameters: [
                         string(name: 'dockerNamespace', value: "${params.dockerNamespace}"),
                         string(name: 'dockerEnv', value: "${env.DEPLOY_ENV}"),
                         string(name: 'dockerImageName', value: "${params.dockerImageName}"),
