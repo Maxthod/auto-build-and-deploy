@@ -55,6 +55,8 @@ pipeline {
         DOCKER_IMAGE_NAME = "${params.dockerImageName}"
         DOCKER_VERSION = "${params.dockerTag}"
 
+        DOCKER_FULL_IMAGE_NAME = "${env.DOCKER_REGISTRY}/${env.DOCKER_NAMESPACE}/${env.DOCKER_IMAGE_NAME}:${env.DOCKER_VERSION}"
+
     }
 
     stages {
