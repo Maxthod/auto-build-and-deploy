@@ -16,7 +16,7 @@ pipeline {
 
 
         //string(name: 'dockerImageName', description: 'The last extension of a docker image name')
-//        string(name: 'dockerImageName', description: 'The last extension of a docker image name')
+        string(name: 'dockerImageName', description: 'The last extension of a docker image name')
         string(name: 'dockerImage', description: 'The last extension of a docker image name')
 
         //string(name: 'dockerTag', description: 'The Docker Tag to be deploy')
@@ -42,7 +42,8 @@ pipeline {
 
         DOCKER_VERSION = "${params.dockerTag}"
 
-        NOT_JENKINS_URL = "${params.notJenkinsAddr}/${params.dockerStackName}-${params.dockerEnv}/${params.dockerServiceName}"
+//        NOT_JENKINS_URL = "${params.notJenkinsAddr}/${params.dockerStackName}-${params.dockerEnv}/${params.dockerServiceName}"
+        NOT_JENKINS_URL = "${params.notJenkinsAddr}/${params.dockerStackName}-${params.dockerEnv}/${params.dockerImageName}"
 
         NOT_JENKINS_SECRET = credentials("${params.notJenkinsSecret}")
 

@@ -201,6 +201,7 @@ pipeline {
 
                 script {
                     build job: 'auto-deploy/master', parameters: [
+                        string(name: 'dockerImageName', value: "${params.dockerImageName}"),
                         string(name: 'dockerImage', value: "${env.DOCKER_FULL_IMAGE_NAME}"),
                         string(name: 'dockerTag', value: "${env.DOCKER_VERSION}"),
                         string(name: 'dockerStackName', value: "${params.dockerStackName}"),
