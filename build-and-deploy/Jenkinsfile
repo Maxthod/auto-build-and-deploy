@@ -140,6 +140,7 @@ pipeline {
                             sh "git clone https://${env.GIT_REPOSITORY_CREDENTIALS_USR}:${env.GIT_REPOSITORY_CREDENTIALS_PSW}@${env.GIT_REPOSITORY} -b ${env.GIT_BRANCH} ${workdir}"
                             sh "cd ${workdir}"
                             sh "git tag"
+                            sh "git log | head -n 20"
                             sh "git remote set-url origin https://${GIT_REPOSITORY_CREDENTIALS_USR}:${GIT_REPOSITORY_CREDENTIALS_PSW}@${GIT_REPOSITORY}"
                             sh "git fetch --tags > /dev/null"
                             sh "git tag"
